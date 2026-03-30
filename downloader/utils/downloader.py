@@ -9,7 +9,8 @@ def get_video_info(url):
     """Get info about a single video without downloading"""
     ydl_opts = {
         'quiet': True,
-        'cookiefile': COOKIE_PATH  # <-- VIP Pass injected
+        'cookiefile': COOKIE_PATH,  # <-- VIP Pass injected
+        'extractor_args': {'youtube': ['player_client=android']}, # <-- Android Disguise
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
@@ -25,7 +26,8 @@ def get_playlist_info(url):
     ydl_opts = {
         'quiet': True,
         'extract_flat': True,  # don't download, just list
-        'cookiefile': COOKIE_PATH  # <-- VIP Pass injected
+        'cookiefile': COOKIE_PATH,  # <-- VIP Pass injected
+        'extractor_args': {'youtube': ['player_client=android']}, # <-- Android Disguise
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
@@ -57,7 +59,8 @@ def download_video(url, format='mp4', quality='720p', output_dir='media/videos/'
                 'preferredcodec': 'mp3',
             }],
             'quiet': True,
-            'cookiefile': COOKIE_PATH  # <-- VIP Pass injected
+            'cookiefile': COOKIE_PATH,  # <-- VIP Pass injected
+            'extractor_args': {'youtube': ['player_client=android']}, # <-- Android Disguise
         }
     else:
         quality_map = {'360p': '360', '720p': '720', '1080p': '1080'}
@@ -67,7 +70,8 @@ def download_video(url, format='mp4', quality='720p', output_dir='media/videos/'
             'outtmpl': f'{output_dir}/%(title)s.%(ext)s',
             'merge_output_format': 'mp4',
             'quiet': True,
-            'cookiefile': COOKIE_PATH  # <-- VIP Pass injected
+            'cookiefile': COOKIE_PATH,  # <-- VIP Pass injected
+            'extractor_args': {'youtube': ['player_client=android']}, # <-- Android Disguise
         }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
