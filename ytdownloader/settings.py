@@ -145,5 +145,12 @@ REST_FRAMEWORK = {
     ),
 }
 
-# CORS Settings
-CORS_ALLOW_ALL_ORIGINS = True
+# If DEBUG is True (local), allow everything. 
+# If DEBUG is False (production on Render), only allow your Vercel URL.
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [
+        "https://vibe-loader.vercel.app/",
+    ]
