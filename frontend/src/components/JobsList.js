@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config'; // Import the smart URL
 
 function JobsList() {
   const [jobs, setJobs] = useState([]);
 
   const fetchJobs = async () => {
     try {
-      // 1. Fetch the list of jobs! (No more username/password needed since we made it public)
-      const response = await axios.get('http://127.0.0.1:8000/api/jobs/');
+      // Uses the dynamic URL from config.js
+      const response = await axios.get(`${API_BASE_URL}/api/jobs/`);
       setJobs(response.data);
     } catch (error) {
       console.error("Error fetching jobs", error);
@@ -15,10 +16,8 @@ function JobsList() {
   };
 
   useEffect(() => {
-    // Fetch immediately on load
     fetchJobs();
-    
-    // Set up a timer to fetch updates every 3 seconds (Real-time polling!)
+    // Real-time polling every 3 seconds
     const interval = setInterval(fetchJobs, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -28,7 +27,9 @@ function JobsList() {
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Downloads</h2>
       
       {jobs.length === 0 ? (
-        <p className="text-gray-500 text-center bg-white p-6 rounded-xl shadow-sm">No downloads yet. Paste a link above!</p>
+        <p className="text-gray-500 text-center bg-white p-6 rounded-xl shadow-sm">
+          No downloads yet. Paste a link above!
+        </p>
       ) : (
         jobs.map(job => (
           <div key={job.id} className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 flex justify-between items-center">
@@ -47,14 +48,11 @@ function JobsList() {
             
             {job.status === 'done' && (
               <a 
-                // FIXED: Removed the hardcoded /media/ so it doesn't double up!
-                href={`http://127.0.0.1:8000${job.zip_file_path ? job.zip_file_path : (job.videos[0]?.file_path)}`} 
+                href={`${API_BASE_URL}/api/download-and-clean/${job.id}/`} 
                 download
-                target="_blank"
-                rel="noreferrer"
-                className="bg-green-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-green-600 transition flex-shrink-0 text-center"
+                className="bg-green-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-green-600 transition"
               >
-                {job.job_type === 'playlist' && job.zip_file_path ? 'Download ZIP 📦' : 'Download File 🎬'}
+                {job.job_type === 'playlist' ? 'Download ZIP 📦' : 'Download File 🎬'}
               </a>
             )}
           </div>
