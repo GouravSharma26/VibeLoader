@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config'; // 1. Import your dynamic URL config
 
 function URLInputForm() {
   const [url, setUrl] = useState('');
   const [format, setFormat] = useState('mp4');
   const [quality, setQuality] = useState('720p');
 
-  // --- New Phase 2 States ---
   const [previewData, setPreviewData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVideos, setSelectedVideos] = useState([]);
@@ -16,11 +16,10 @@ function URLInputForm() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      // Calls the Django Preview API we built on Day 4
-      const response = await axios.post('http://127.0.0.1:8000/api/preview/', { url: url });
+      // 2. Use the dynamic API_BASE_URL instead of localhost
+      const response = await axios.post(`${API_BASE_URL}/api/preview/`, { url: url });
       setPreviewData(response.data);
 
-      // By default, auto-select all videos so the user doesn't have to click them all
       if (response.data.videos) {
         setSelectedVideos(response.data.videos.map(v => v.video_id));
       } else {
@@ -33,16 +32,15 @@ function URLInputForm() {
     setIsLoading(false);
   };
 
-  // 2. Toggle video selection on/off when clicking a thumbnail
   const toggleVideo = (videoId) => {
     if (selectedVideos.includes(videoId)) {
-      setSelectedVideos(selectedVideos.filter(id => id !== videoId)); // Remove
+      setSelectedVideos(selectedVideos.filter(id => id !== videoId));
     } else {
-      setSelectedVideos([...selectedVideos, videoId]); // Add
+      setSelectedVideos([...selectedVideos, videoId]);
     }
   };
 
-  // 3. Send the final download request
+  // 2. Send the final download request
   const handleDownload = async () => {
     if (selectedVideos.length === 0) {
       alert("⚠️ Please select at least one video to download!");
@@ -51,16 +49,17 @@ function URLInputForm() {
 
     try {
       const jobType = url.includes('playlist') ? 'playlist' : 'single';
-      const response = await axios.post('http://127.0.0.1:8000/api/jobs/', {
+      // 3. Use the dynamic API_BASE_URL here as well
+      const response = await axios.post(`${API_BASE_URL}/api/jobs/`, {
         url: url,
         job_type: jobType,
         format: format,
         quality: quality,
-        selected_videos: selectedVideos // <-- We will tell Django how to read this next!
+        selected_videos: selectedVideos 
       });
 
       alert(`✅ Success! Job ID: ${response.data.id} has started!`);
-      setPreviewData(null); // Reset back to input screen
+      setPreviewData(null); 
       setUrl('');
     } catch (error) {
       console.error(error);
@@ -70,7 +69,6 @@ function URLInputForm() {
 
   return (
     <div className="w-full max-w-5xl mx-auto mt-8">
-      {/* View 1: If no preview data, show the URL input form */}
       {!previewData ? (
         <form onSubmit={handlePreview} className="bg-white p-8 rounded-xl shadow-md space-y-4 max-w-xl mx-auto border-t-4 border-blue-600">
           <div>
@@ -94,7 +92,6 @@ function URLInputForm() {
           </button>
         </form>
       ) : (
-        /* View 2: If we DO have preview data, show the Selection Grid! */
         <div className="bg-white p-6 rounded-xl shadow-lg space-y-6">
           <div className="flex justify-between items-center border-b pb-4">
             <h2 className="text-2xl font-bold text-gray-800">
@@ -105,7 +102,6 @@ function URLInputForm() {
             </button>
           </div>
 
-          {/* Grid of Videos */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[500px] overflow-y-auto p-2">
             {(previewData.videos || [previewData]).map((video) => (
               <div
@@ -132,7 +128,6 @@ function URLInputForm() {
             ))}
           </div>
 
-          {/* Download Settings & Submit */}
           <div className="bg-gray-50 border p-5 rounded-xl flex flex-col md:flex-row gap-4 items-end">
             <div className="flex-1 w-full">
               <label className="block text-gray-700 font-bold mb-2">Format</label>
