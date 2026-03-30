@@ -16,6 +16,9 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Use the cloud Redis if available, otherwise use local
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+
 # Media files setup (where videos are saved and served from)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -29,7 +32,7 @@ SECRET_KEY = 'django-insecure-z2o%!m(4&zwgfzv&-@x3thf+^&+a-nzua%7_)qcrrx-jmr-w51
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # Allow all hosts for development; change in production!
 
 # Celery settings
 CELERY_BROKER_URL = 'rediss://default:gQAAAAAAAVm2AAIncDEyZmQ0ZDY4ZWM1MzI0NWE4YjExYTQwMWQ3OTM1NWI1MnAxODg1MDI@relevant-terrapin-88502.upstash.io:6379?ssl_cert_reqs=CERT_NONE'
