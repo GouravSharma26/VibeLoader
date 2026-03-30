@@ -1,9 +1,16 @@
 import yt_dlp
 import os
+from django.conf import settings
+
+# Define the cookie path once at the top so it's easy to maintain
+COOKIE_PATH = os.path.join(settings.BASE_DIR, 'youtube_cookies.txt')
 
 def get_video_info(url):
     """Get info about a single video without downloading"""
-    ydl_opts = {'quiet': True}
+    ydl_opts = {
+        'quiet': True,
+        'cookiefile': COOKIE_PATH  # <-- VIP Pass injected
+    }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
         return {
@@ -18,6 +25,7 @@ def get_playlist_info(url):
     ydl_opts = {
         'quiet': True,
         'extract_flat': True,  # don't download, just list
+        'cookiefile': COOKIE_PATH  # <-- VIP Pass injected
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
@@ -49,6 +57,7 @@ def download_video(url, format='mp4', quality='720p', output_dir='media/videos/'
                 'preferredcodec': 'mp3',
             }],
             'quiet': True,
+            'cookiefile': COOKIE_PATH  # <-- VIP Pass injected
         }
     else:
         quality_map = {'360p': '360', '720p': '720', '1080p': '1080'}
@@ -58,6 +67,7 @@ def download_video(url, format='mp4', quality='720p', output_dir='media/videos/'
             'outtmpl': f'{output_dir}/%(title)s.%(ext)s',
             'merge_output_format': 'mp4',
             'quiet': True,
+            'cookiefile': COOKIE_PATH  # <-- VIP Pass injected
         }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
