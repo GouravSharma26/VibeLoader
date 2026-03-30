@@ -10,11 +10,11 @@ def get_video_info(url):
     """Get info about a single video without downloading"""
     ydl_opts = {
         'quiet': True,
-        # 1. We remove the burned cookie:
+        # NO COOKIES - We want to stay completely anonymous
         # 'cookiefile': COOKIE_PATH,  
         
-        # 2. We upgrade to the dual iOS/Android disguise:
-        'extractor_args': {'youtube': ['player_client=ios,android']}, 
+        # THE ULTIMATE DISGUISE: Pretend to be a Smart TV
+        'extractor_args': {'youtube': ['player_client=tv,mweb']}, 
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
@@ -31,7 +31,7 @@ def get_playlist_info(url):
         'quiet': True,
         'extract_flat': True,  # don't download, just list
         # 'cookiefile': COOKIE_PATH,  
-        'extractor_args': {'youtube': ['player_client=ios,android']}, 
+        'extractor_args': {'youtube': ['player_client=tv,mweb']}, 
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
@@ -64,7 +64,7 @@ def download_video(url, format='mp4', quality='720p', output_dir='media/videos/'
             }],
             'quiet': True,
             # 'cookiefile': COOKIE_PATH,  
-            'extractor_args': {'youtube': ['player_client=ios,android']}, 
+            'extractor_args': {'youtube': ['player_client=tv,mweb']}, 
         }
     else:
         quality_map = {'360p': '360', '720p': '720', '1080p': '1080'}
@@ -75,7 +75,7 @@ def download_video(url, format='mp4', quality='720p', output_dir='media/videos/'
             'merge_output_format': 'mp4',
             'quiet': True,
             # 'cookiefile': COOKIE_PATH,  
-            'extractor_args': {'youtube': ['player_client=ios,android']}, 
+            'extractor_args': {'youtube': ['player_client=tv,mweb']}, 
         }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
