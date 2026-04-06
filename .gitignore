@@ -1,4 +1,4 @@
-# Virtual Environments
+# Virtual Environment
 venv/
 .venv/
 pyvenv.cfg
@@ -6,37 +6,20 @@ pyvenv.cfg
 # Python Cache
 __pycache__/
 *.pyc
-
-# Database
-db.sqlite3
-*.sqlite3
-
-# Downloaded Media & Zips
-media/
-
-# React / Node Packages
-node_modules/
-frontend/node_modules/
-
-# Environment Variables (for later)
-.env
-
-# Python
-venv/
-__pycache__/
-*.pyc
 *.pyo
-.env
 
 # Django
 db.sqlite3
-media/
+*.sqlite3
 *.log
+media/
 
-# Secret files
+# Secret Files
+.env
 youtube_cookies.txt
 
-# Node
+# Node / React
+node_modules/
 frontend/node_modules/
 frontend/build/
 
