@@ -72,40 +72,29 @@ class PreviewView(APIView):
 # --- STANDALONE FUNCTION (NOT INSIDE THE CLASS) ---
 @api_view(['GET'])
 def download_file_and_cleanup(request, pk):
-    """
-    Serves the file to the user and deletes it from the server 
-    immediately after the transfer is complete.
-    """
     job = get_object_or_404(DownloadJob, pk=pk)
     
-    # Check if it's a playlist (ZIP) or single video
     if job.job_type == 'playlist' and job.zip_file_path:
-        file_path = os.path.join(settings.MEDIA_ROOT, job.zip_file_path)
+        file_path = os.path.join(settings.MEDIA_ROOT, str(job.zip_file_path))
     elif job.videos.exists():
-        file_path = os.path.join(settings.MEDIA_ROOT, job.videos.first().file_path)
+        file_path = os.path.join(settings.MEDIA_ROOT, str(job.videos.first().file_path))
     else:
         return Response({"error": "File not found in database"}, status=404)
 
     if os.path.exists(file_path):
-        # Open the file for reading in binary mode
         file_handle = open(file_path, 'rb')
-        response = FileResponse(file_handle)
+        response = FileResponse(file_handle, as_attachment=True, 
+                               filename=os.path.basename(file_path))
         
-        # This callback runs AFTER the user finishes downloading
         def cleanup():
-            file_handle.close() 
+            file_handle.close()
             if os.path.exists(file_path):
-                # If it's a zip, we might want to delete the whole temp folder
                 if job.job_type == 'playlist':
                     folder_path = os.path.dirname(file_path)
                     if os.path.isdir(folder_path) and "playlist_" in folder_path:
                         shutil.rmtree(folder_path)
-                
-                # Delete the specific file if it's still there
                 if os.path.exists(file_path):
                     os.remove(file_path)
-                
-                # Delete the record from DB so it's gone on refresh
                 job.delete()
                 print(f"CLEANED: Removed {file_path} and Job {pk}")
 

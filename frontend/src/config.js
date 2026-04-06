@@ -1,5 +1,3 @@
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://vibeloader-backend.onrender.com' 
-  : 'http://127.0.0.1:8000';
+const API_BASE_URL = 'https://cinereous-unarduously-son.ngrok-free.dev';
 
 export default API_BASE_URL;

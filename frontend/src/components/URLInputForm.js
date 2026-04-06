@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import API_BASE_URL from '../config'; // 1. Import your dynamic URL config
+import API_BASE_URL from '../config';
 
-function URLInputForm() {
+const HEADERS = { 'ngrok-skip-browser-warning': 'true' };
+
+function URLInputForm({ token }) {
   const [url, setUrl] = useState('');
   const [format, setFormat] = useState('mp4');
   const [quality, setQuality] = useState('720p');
-
   const [previewData, setPreviewData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVideos, setSelectedVideos] = useState([]);
 
-  // 1. Fetch the preview info first
   const handlePreview = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      // 2. Use the dynamic API_BASE_URL instead of localhost
-      const response = await axios.post(`${API_BASE_URL}/api/preview/`, { url: url });
+      const response = await axios.post(
+        `${API_BASE_URL}/api/preview/`,
+        { url: url },
+        { headers: { ...HEADERS, Authorization: `Bearer ${token}` } }
+      );
       setPreviewData(response.data);
-
       if (response.data.videos) {
         setSelectedVideos(response.data.videos.map(v => v.video_id));
       } else {
@@ -40,30 +42,30 @@ function URLInputForm() {
     }
   };
 
-  // 2. Send the final download request
   const handleDownload = async () => {
     if (selectedVideos.length === 0) {
-      alert("⚠️ Please select at least one video to download!");
+      alert("⚠️ Please select at least one video!");
       return;
     }
-
     try {
       const jobType = url.includes('playlist') ? 'playlist' : 'single';
-      // 3. Use the dynamic API_BASE_URL here as well
-      const response = await axios.post(`${API_BASE_URL}/api/jobs/`, {
-        url: url,
-        job_type: jobType,
-        format: format,
-        quality: quality,
-        selected_videos: selectedVideos 
-      });
-
-      alert(`✅ Success! Job ID: ${response.data.id} has started!`);
-      setPreviewData(null); 
+      const response = await axios.post(
+        `${API_BASE_URL}/api/jobs/`,
+        {
+          url: url,
+          job_type: jobType,
+          format: format,
+          quality: quality,
+          selected_videos: selectedVideos
+        },
+        { headers: { ...HEADERS, Authorization: `Bearer ${token}` } }
+      );
+      alert(`✅ Download started! Job ID: ${response.data.id}`);
+      setPreviewData(null);
       setUrl('');
     } catch (error) {
       console.error(error);
-      alert("❌ Oops! Something went wrong starting the download.");
+      alert("❌ Something went wrong. Try again.");
     }
   };
 
@@ -108,10 +110,16 @@ function URLInputForm() {
                 key={video.video_id}
                 onClick={() => toggleVideo(video.video_id)}
                 className={`cursor-pointer border-2 rounded-xl p-3 transition-all transform hover:scale-105 ${
-                  selectedVideos.includes(video.video_id) ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-gray-200 hover:border-blue-300'
+                  selectedVideos.includes(video.video_id)
+                    ? 'border-blue-500 bg-blue-50 shadow-md'
+                    : 'border-gray-200 hover:border-blue-300'
                 }`}
               >
-                <img src={`https://i.ytimg.com/vi/${video.video_id}/mqdefault.jpg`} alt="thumbnail" className="w-full h-32 object-cover rounded-lg mb-3" />
+                <img
+                  src={`https://i.ytimg.com/vi/${video.video_id}/mqdefault.jpg`}
+                  alt="thumbnail"
+                  className="w-full h-32 object-cover rounded-lg mb-3"
+                />
                 <p className="font-semibold text-sm text-gray-800 line-clamp-2 h-10">{video.title}</p>
                 <div className="mt-2 flex items-center">
                   <input

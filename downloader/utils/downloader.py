@@ -10,11 +10,8 @@ def get_video_info(url):
     """Get info about a single video without downloading"""
     ydl_opts = {
         'quiet': True,
-        # NO COOKIES - We want to stay completely anonymous
-        # 'cookiefile': COOKIE_PATH,  
-        
-        # THE ULTIMATE DISGUISE: Pretend to be a Smart TV
-        'extractor_args': {'youtube': ['player_client=tv,mweb']}, 
+        'no_warnings': True,
+        'extractor_args': {'youtube': ['player_client=tv,mweb']},
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)

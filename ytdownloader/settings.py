@@ -39,7 +39,10 @@ CELERY_BROKER_URL = 'rediss://default:gQAAAAAAAVm2AAIncDEyZmQ0ZDY4ZWM1MzI0NWE4Yj
 CELERY_RESULT_BACKEND = 'rediss://default:gQAAAAAAAVm2AAIncDEyZmQ0ZDY4ZWM1MzI0NWE4YjExYTQwMWQ3OTM1NWI1MnAxODg1MDI@relevant-terrapin-88502.upstash.io:6379?ssl_cert_reqs=CERT_NONE'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'visibility_timeout': 3600,
+    'socket_keepalive': True,
+}
 # Application definition
 
 INSTALLED_APPS = [
@@ -134,23 +137,32 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 # REST Framework settings
-# REST Framework settings
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication', # <-- Add this line!
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
 }
 
-# If DEBUG is True (local), allow everything. 
-# If DEBUG is False (production on Render), only allow your Vercel URL.
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
-else:
-    CORS_ALLOW_ALL_ORIGINS = False
-    CORS_ALLOWED_ORIGINS = [
-        "https://vibe-loader.vercel.app/",
-    ]
+NGROK_HEADER = True
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'ngrok-skip-browser-warning',
+]
